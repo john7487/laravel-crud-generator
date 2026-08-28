@@ -1,0 +1,23 @@
+{
+    "name": "altenjohn/laravel-crud-generator",
+    "description": "CRUD generator for Laravel",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.3",
+        "illuminate/console": "^12.0|^13.0",
+        "illuminate/support": "^12.0|^13.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "AltenJohn\\CrudGenerator\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "AltenJohn\\CrudGenerator\\CrudGeneratorServiceProvider"
+            ]
+        }
+    }
+}

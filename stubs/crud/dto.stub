@@ -1,0 +1,20 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\DTOs\{{ model }};
+
+final readonly class {{ crud }}{{ model }}DTO
+{
+    /**
+     * Create a new class instance.
+     */
+    public function __construct(
+        
+        public array $attributes,
+      //  public string $name,
+
+    )
+    {}
+}
+

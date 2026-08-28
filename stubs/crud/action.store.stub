@@ -1,0 +1,30 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Actions\{{ model }};
+
+use App\DTOs\{{ model }}\{{ crud }}{{ model }}DTO;
+use App\Models\{{ model }};
+
+
+final class {{ crud }}{{ model }}Action
+{
+    /**
+     * Create a new class instance.
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    public function execute({{ crud }}{{ model }}DTO $data): array
+    {
+
+        ${{ variable }} = {{ model }}::query()->create($data->attributes);
+
+        return [
+            '{{ variable }}' => ${{ variable }},
+        ];
+    }
+}

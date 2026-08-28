@@ -1,0 +1,21 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\DTOs\{{ model }};
+use Illuminate\Http\UploadedFile;
+
+
+final readonly class {{ crud }}{{ model }}DTO
+{
+    /**
+     * Create a new class instance.
+     */
+    public function __construct(
+        
+        public UploadedFile $file,
+
+    )
+    {}
+}
+

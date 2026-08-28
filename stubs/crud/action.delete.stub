@@ -1,0 +1,29 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Actions\{{ model }};
+
+use App\Models\{{ model }};
+
+
+final class {{ crud }}{{ model }}Action
+{
+    /**
+     * Create a new class instance.
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    public function execute({{ model }} ${{ variable }}): array
+    {
+
+        ${{ variable }}->delete();
+
+        return [
+       
+        ];
+    }
+}

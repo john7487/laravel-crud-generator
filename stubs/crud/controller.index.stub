@@ -1,0 +1,34 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers\Api{{ controller_namespace }}\{{ model }};
+
+use App\Http\Resources\Api{{ controller_namespace }}\{{ model }}Resource;
+use App\Models\{{ model }};
+use App\Traits\ApiResponse;
+use Illuminate\Http\JsonResponse;
+// use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
+
+final class {{ crud }}Controller
+{
+    use ApiResponse;
+
+    public function __invoke(): JsonResponse
+    {
+        ${{ table }} = QueryBuilder::for({{ model }}::class)
+
+        //    ->allowedFilters(
+        //        AllowedFilter::partial('name'),
+        //    )
+
+            ->defaultSort('id')
+            ->paginate()
+            ->appends(request()->query());
+
+           
+
+        return $this->successCollection({{ model }}Resource::collection(${{ table }}));
+    }
+}
