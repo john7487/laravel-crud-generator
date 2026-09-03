@@ -1,0 +1,81 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Models\{{ model }};
+
+it('can store a {{ variable }}', function (): void {
+    $payload = [
+        'name' => 'Test {{ model }}',
+        'sku' => 'PRD-001',
+        'description' => '{{ model }} description',
+        'price' => 150000.50,
+        'stock' => 100,
+        'weight' => 1.25,
+        'is_active' => true,
+    ];
+
+    $response = $this->post('/api/{{ route_path }}/{{ table }}', $payload);
+
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'data' => [
+                'type',
+                'id',
+                'attributes',
+            ],
+        ]);
+
+    $this->assertDatabaseHas('{{ table }}', [
+        'name' => 'Test {{ model }}',
+        'sku' => 'PRD-001',
+        'stock' => 100,
+    ]);
+
+    expect({{ model }}::query()->count())->toBe(1);
+});
+
+it('requires required fields when storing a {{ variable }}', function (): void {
+    $response = $this->post('/api/{{ route_path }}/{{ table }}', []);
+
+    $response->assertUnprocessable();
+
+    $response
+        ->assertUnprocessable()
+        ->assertJsonCount(5, 'errors')
+        ->assertJsonPath('errors.0.source.pointer', '/data/attributes/name')
+        ->assertJsonPath('errors.1.source.pointer', '/data/attributes/sku')
+        ->assertJsonPath('errors.2.source.pointer', '/data/attributes/price')
+        ->assertJsonPath('errors.3.source.pointer', '/data/attributes/stock')
+        ->assertJsonPath('errors.4.source.pointer', '/data/attributes/is_active');
+
+});
+
+it('requires a unique sku when storing a {{ variable }}', function (): void {
+    {{ model }}::factory()->create([
+        'sku' => 'PRD-001',
+    ]);
+
+    $payload = [
+        'name' => 'Another {{ model }}',
+        'sku' => 'PRD-001',
+        'description' => '{{ model }} description',
+        'price' => 150000.50,
+        'stock' => 100,
+        'weight' => 1.25,
+        'is_active' => true,
+    ];
+
+    $response = $this->post('/api/{{ route_path }}/{{ table }}', $payload);
+
+    $response->assertUnprocessable();
+
+    $errors = $response->json('errors');
+
+    expect(
+        collect($errors)
+            ->pluck('source.pointer')
+            ->all()
+    )->toContain('/data/attributes/sku');
+});

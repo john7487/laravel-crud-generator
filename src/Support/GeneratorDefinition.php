@@ -17,10 +17,9 @@ final readonly class GeneratorDefinition
         public ?string $crud = null,
         public bool $timestamp = false,
         public ?string $option = null,
-    )
-    {}
+    ) {}
 
-    public function resolvePath(array $replacements): string 
+    public function resolvePath(array $replacements): string
     {
         $directory = str_replace(
             array_keys($replacements),
@@ -35,16 +34,13 @@ final readonly class GeneratorDefinition
         );
 
         if ($this->timestamp) {
-        $timestamp = now()->format('Y_m_d_His');
+            $timestamp = now()->format('Y_m_d_His');
 
-        $filename = "{$timestamp}_{$filename}";
-    }
-
-
+            $filename = "{$timestamp}_{$filename}";
+        }
 
         return base_path(
             "{$directory}/{$filename}"
         );
     }
-
 }

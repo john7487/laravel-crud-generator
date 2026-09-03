@@ -1,0 +1,39 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Models\{{ model }};
+
+it('can show a {{ variable }}', function (): void {
+    ${{ variable }} = {{ model }}::factory()->create([
+        'name' => 'Test {{ model }}',
+        'sku' => 'PRD-001',
+    ]);
+
+    $response = $this->get("/api/{{ route_path }}/{{ table }}/{${{ variable }}->id}");
+
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'data' => [
+                'type',
+                'id',
+                'attributes',
+            ],
+        ]);
+
+    expect($response->json('data.id'))
+        ->toBe((string) ${{ variable }}->id);
+
+    expect($response->json('data.attributes.name'))
+        ->toBe('Test {{ model }}');
+
+    expect($response->json('data.attributes.sku'))
+        ->toBe('PRD-001');
+});
+
+it('returns not found when {{ variable }} does not exist', function (): void {
+    $response = $this->get('/api/{{ route_path }}/{{ table }}/999999');
+
+    $response->assertNotFound();
+});

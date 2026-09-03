@@ -1,0 +1,178 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Models\{{ model }};
+
+it('can update a {{ variable }}', function (): void {
+    ${{ variable }} = {{ model }}::factory()->create([
+        'name' => 'Old {{ model }}',
+        'sku' => 'PRD-001',
+        'price' => 10000,
+        'stock' => 10,
+    ]);
+
+    $payload = [
+        'name' => 'Updated {{ model }}',
+        'sku' => 'PRD-002',
+        'description' => 'Updated description',
+        'price' => 25000,
+        'stock' => 50,
+        'weight' => 2.50,
+        'is_active' => true,
+    ];
+
+    $response = $this->put(
+        "/api/{{ route_path }}/{{ table }}/{${{ variable }}->id}",
+        $payload
+    );
+
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'data' => [
+                'type',
+                'id',
+                'attributes',
+            ],
+        ]);
+
+    $this->assertDatabaseHas('{{ table }}', [
+        'id' => ${{ variable }}->id,
+        'name' => 'Updated {{ model }}',
+        'sku' => 'PRD-002',
+        'price' => 25000,
+        'stock' => 50,
+    ]);
+});
+
+it('can update a {{ variable }} using patch', function (): void {
+    ${{ variable }} = {{ model }}::factory()->create([
+        'name' => 'Old {{ model }}',
+        'sku' => 'PRD-001',
+        'price' => 10000,
+        'stock' => 10,
+    ]);
+
+    $payload = [
+        'name' => 'Patched {{ model }}',
+        'sku' => 'PRD-003',
+        'description' => 'Patched description',
+        'price' => 30000,
+        'stock' => 75,
+        'weight' => 3.50,
+        'is_active' => false,
+    ];
+
+    $response = $this->patch(
+        "/api/{{ route_path }}/{{ table }}/{${{ variable }}->id}",
+        $payload
+    );
+
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'data' => [
+                'type',
+                'id',
+                'attributes',
+            ],
+        ]);
+
+    $this->assertDatabaseHas('{{ table }}', [
+        'id' => ${{ variable }}->id,
+        'name' => 'Patched {{ model }}',
+        'sku' => 'PRD-003',
+        'price' => 30000,
+        'stock' => 75,
+        'is_active' => false,
+    ]);
+});
+
+it('returns not found when updating a {{ variable }} that does not exist', function (): void {
+    $payload = [
+        'name' => 'Updated {{ model }}',
+        'sku' => 'PRD-999',
+        'description' => 'Updated description',
+        'price' => 25000,
+        'stock' => 50,
+        'weight' => 2.50,
+        'is_active' => true,
+    ];
+
+    $response = $this->put('/api/{{ route_path }}/{{ table }}/999999', $payload);
+
+    $response->assertNotFound();
+});
+
+it('requires a unique sku when updating a {{ variable }}', function (): void {
+    ${{ variable }} = {{ model }}::factory()->create([
+        'sku' => 'PRD-001',
+    ]);
+
+    {{ model }}::factory()->create([
+        'sku' => 'PRD-002',
+    ]);
+
+    $payload = [
+        'name' => 'Updated {{ model }}',
+        'sku' => 'PRD-002',
+        'description' => 'Updated description',
+        'price' => 25000,
+        'stock' => 50,
+        'weight' => 2.50,
+        'is_active' => true,
+    ];
+
+    $response = $this->put(
+        "/api/{{ route_path }}/{{ table }}/{${{ variable }}->id}",
+        $payload
+    );
+
+    $response->assertUnprocessable();
+
+    $errors = $response->json('errors');
+
+    expect(
+        collect($errors)
+            ->pluck('source.pointer')
+            ->all()
+    )->toContain('/data/attributes/sku');
+});
+
+it('allows keeping the current sku when updating a {{ variable }}', function (): void {
+    ${{ variable }} = {{ model }}::factory()->create([
+        'sku' => 'PRD-001',
+    ]);
+
+    $payload = [
+        'name' => 'Updated {{ model }}',
+        'sku' => 'PRD-001',
+        'description' => 'Updated description',
+        'price' => 25000,
+        'stock' => 50,
+        'weight' => 2.50,
+        'is_active' => true,
+    ];
+
+    $response = $this->put(
+        "/api/{{ route_path }}/{{ table }}/{${{ variable }}->id}",
+        $payload
+    );
+
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'data' => [
+                'type',
+                'id',
+                'attributes',
+            ],
+        ]);
+
+    $this->assertDatabaseHas('{{ table }}', [
+        'id' => ${{ variable }}->id,
+        'sku' => 'PRD-001',
+        'name' => 'Updated {{ model }}',
+    ]);
+});

@@ -6,13 +6,8 @@ namespace App\Http\Controllers\Api{{ controller_namespace }}\{{ model }};
 
 use App\Actions\{{ model }}\{{ crud }}{{ model }}Action;
 use App\Http\Requests\Api{{ controller_namespace }}\{{ model }}\{{ crud }}Request;
-use App\Http\Resources\Api{{ controller_namespace }}\{{ model }}Resource;
-
-use App\Models\{{ model }};
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
-use Spatie\QueryBuilder\QueryBuilder;
-
 
 final class {{ crud }}Controller
 {
@@ -23,21 +18,10 @@ final class {{ crud }}Controller
 
         $result = $action->execute($request->toDto());
 
-        return $this->noData(           
-        meta:   [
-                   'inserted' => $result['inserted'],
-                ]
+        return $this->noData(
+            meta: [
+                'inserted' => $result['inserted'],
+            ]
         );
-
-
-
- //       $provinces = QueryBuilder::for(Province::class)
- //           ->defaultSort('id')
- //           ->paginate()
- //           ->appends(request()->query());
- //       return $this->successCollection(
- //           ProvinceResource::collection($provinces)
- //           );
-
     }
 }

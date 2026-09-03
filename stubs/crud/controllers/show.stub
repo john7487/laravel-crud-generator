@@ -3,12 +3,11 @@
 declare(strict_types=1);
 
 namespace App\Http\Controllers\Api{{ controller_namespace }}\{{ model }};
-use App\Http\Resources\Api{{ controller_namespace }}\{{ model }}Resource;
 
+use App\Http\Resources\Api{{ controller_namespace }}\{{ model }}Resource;
 use App\Models\{{ model }};
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
-
 
 final class {{ crud }}Controller
 {
@@ -17,13 +16,12 @@ final class {{ crud }}Controller
     public function __invoke({{ model }} ${{ variable }}): JsonResponse
     {
 
-  
         return $this->success(
             resource: new {{ model }}Resource(${{ variable }}),
             meta: [
-                    //
-                ],
-            );
+                //
+            ],
+        );
 
     }
 }

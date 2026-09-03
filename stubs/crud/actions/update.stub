@@ -7,21 +7,15 @@ namespace App\Actions\{{ model }};
 use App\DTOs\{{ model }}\{{ crud }}{{ model }}DTO;
 use App\Models\{{ model }};
 
-
 final class {{ crud }}{{ model }}Action
 {
     /**
-     * Create a new class instance.
+     * @return array<string, {{ model }}>
      */
-    public function __construct()
-    {
-        //
-    }
-
-    public function execute({{ crud }}{{ model }}DTO $data): array
+    public function execute({{ crud }}{{ model }}DTO $data, {{ model }} ${{ variable }}): array
     {
 
-        ${{ variable }} = {{ model }}::query()->create($data->attributes);
+        ${{ variable }}->Update($data->attributes);
 
         return [
             '{{ variable }}' => ${{ variable }},

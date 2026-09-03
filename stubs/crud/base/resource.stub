@@ -18,13 +18,19 @@ final class {{ model }}Resource extends JsonApiResource
      * @var list<string>
      */
     public array $attributes = [
-        'name'
+        'name',
+        'sku',
+        'description',
+        'price',
+        'stock',
+        'weight',
+        'is_active',
     ];
 
     /**
      * The resource's relationships.
      *
-     * @var list<string>
+     * @var list<string> | array<string, class-string>
      */
     public array $relationships = [
         //

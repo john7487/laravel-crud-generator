@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace AltenJohn\CrudGenerator\Support;
 
 use RuntimeException;
+use Throwable;
 
-//use RuntimeException;
+// use RuntimeException;
 
-class StubGenerator
+final class StubGenerator
 {
     /**
      * Create a new class instance.
@@ -25,11 +26,9 @@ class StubGenerator
         bool $force = false,
     ): GeneratorResult {
 
+        try {
 
-     try {
-
-        $stubPath = $this->resolveStub($stub);
-   
+            $stubPath = $this->resolveStub($stub);
 
             if (! file_exists($stubPath)) {
                 return new GeneratorResult(
@@ -39,8 +38,7 @@ class StubGenerator
                 );
             }
 
-
-               if (
+            if (
                 file_exists($destination)
                 && ! $force
             ) {
@@ -51,8 +49,7 @@ class StubGenerator
                 );
             }
 
-
-        $content = file_get_contents($stubPath);
+            $content = file_get_contents($stubPath);
 
             if ($content === false) {
                 return new GeneratorResult(
@@ -60,7 +57,7 @@ class StubGenerator
                     path: $destination,
                     message: "Unable to read stub [{$stub}].",
                 );
-        }
+            }
 
             $content = str_replace(
                 array_keys($replacements),
@@ -68,12 +65,10 @@ class StubGenerator
                 $content,
             );
 
+            // Normalize line endings to LF
+            $content = $this->normalizeLineEndings($content);
 
-
-
-        $directory = dirname($destination);
-
-
+            $directory = dirname($destination);
 
             if (! is_dir($directory)) {
                 if (! mkdir($directory, 0755, true)) {
@@ -103,38 +98,46 @@ class StubGenerator
                 path: $destination,
                 message: 'File created successfully.',
             );
-        } catch (\Throwable $e) {
+        } catch (Throwable $throwable) {
             return new GeneratorResult(
                 status: 'failed',
                 path: $destination,
-                message: $e->getMessage(),
+                message: $throwable->getMessage(),
             );
         }
 
     }
 
+    private function resolveStub(string $stub): string
+    {
+        // 1. Custom stub milik project
+        $projectStub = base_path('stubs/'.$stub);
 
-private function resolveStub(string $stub): string
-{
-    // 1. Custom stub milik project
-    $projectStub = base_path('stubs/' . $stub);
+        if (is_file($projectStub)) {
+            return $projectStub;
+        }
 
-    if (is_file($projectStub)) {
-        return $projectStub;
+        // 2. Default stub milik package
+        $packageStub = dirname(__DIR__, 2)
+            .'/stubs/'
+            .$stub;
+
+        if (is_file($packageStub)) {
+            return $packageStub;
+        }
+
+        throw new RuntimeException(
+            "[{$stub}] not found."
+        );
     }
 
-    // 2. Default stub milik package
-    $packageStub = dirname(__DIR__, 2)
-        . '/stubs/'
-        . $stub;
-
-    if (is_file($packageStub)) {
-        return $packageStub;
+    // Normalize line endings to LF
+    private function normalizeLineEndings(string $content): string
+    {
+        return str_replace(
+            ["\r\n", "\r"],
+            "\n",
+            $content,
+        );
     }
-
-    throw new RuntimeException(
-        "[{$stub}] not found."
-    );
-}
-
 }

@@ -1,0 +1,17 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Actions\{{ model }};
+
+use App\Models\{{ model }};
+
+final class {{ crud }}{{ model }}Action
+{
+    public function execute({{ model }} ${{ variable }}): void
+    {
+
+        ${{ variable }}->delete();
+
+    }
+}

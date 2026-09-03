@@ -1,0 +1,46 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Models\{{ model }};
+
+it('can export {{ table }} to csv', function (): void {
+    {{ model }}::factory()->create([
+        'name' => '{{ model }} A',
+        'sku' => 'SKU-001',
+        'description' => 'Description A',
+        'price' => 10000,
+        'stock' => 10,
+        'weight' => 1.5,
+        'is_active' => true,
+    ]);
+
+    {{ model }}::factory()->create([
+        'name' => '{{ model }} B',
+        'sku' => 'SKU-002',
+        'description' => 'Description B',
+        'price' => 20000,
+        'stock' => 20,
+        'weight' => 2.5,
+        'is_active' => false,
+    ]);
+
+    $response = $this->get('/api/{{ route_path }}/{{ table }}/export');
+
+    $response
+        ->assertSuccessful()
+        ->assertHeader('content-type', 'text/csv; charset=UTF-8')
+        ->assertHeader(
+            'content-disposition',
+            'attachment; filename={{ table }}.csv',
+        );
+
+    $content = $response->streamedContent();
+
+    expect($content)
+        ->toContain('id;name;sku;description;price;stock;weight;is_active')
+        ->toContain('{{ model }} A')
+        ->toContain('SKU-001')
+        ->toContain('{{ model }} B')
+        ->toContain('SKU-002');
+});

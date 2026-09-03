@@ -2,19 +2,20 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\Api{{ controller_namespace }}\{{ model }}\IndexController;
-use App\Http\Controllers\Api{{ controller_namespace }}\{{ model }}\StoreController;
-use App\Http\Controllers\Api{{ controller_namespace }}\{{ model }}\ImportController;
-use App\Http\Controllers\Api{{ controller_namespace }}\{{ model }}\ShowController;
-use App\Http\Controllers\Api{{ controller_namespace }}\{{ model }}\UpdateController;
 use App\Http\Controllers\Api{{ controller_namespace }}\{{ model }}\DeleteController;
-
+use App\Http\Controllers\Api{{ controller_namespace }}\{{ model }}\ExportController;
+use App\Http\Controllers\Api{{ controller_namespace }}\{{ model }}\ImportController;
+use App\Http\Controllers\Api{{ controller_namespace }}\{{ model }}\IndexController;
+use App\Http\Controllers\Api{{ controller_namespace }}\{{ model }}\ShowController;
+use App\Http\Controllers\Api{{ controller_namespace }}\{{ model }}\StoreController;
+use App\Http\Controllers\Api{{ controller_namespace }}\{{ model }}\UpdateController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['throttle:api'])->prefix('{{ table }}')->name('{{ table }}.')->group(function (): void {
     Route::get('/', IndexController::class)->name('index');
     Route::post('/', StoreController::class)->name('store');
     Route::post('/import', ImportController::class)->name('import');
+    Route::get('/export', ExportController::class)->name('export');
     Route::get('/{{{ variable }}}', ShowController::class)->name('show');
     Route::put('/{{{ variable }}}', UpdateController::class)->name('update');
     Route::patch('/{{{ variable }}}', UpdateController::class)->name('update');

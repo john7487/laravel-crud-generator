@@ -1,13 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Api{{ controller_namespace }}\{{ model }};
 
 use App\DTOs\{{ model }}\{{ crud }}{{ model }}DTO;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class {{ crud }}Request extends FormRequest
+final class {{ crud }}Request extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,26 +27,23 @@ class {{ crud }}Request extends FormRequest
     {
 
         return [
-
-            'file' => [
-                'required',
-                'file',
-                'mimes:csv,txt',
-                'max:10240',
-            ],
-
+            'name' => ['required', 'string', 'max:255'],
+            'sku' => ['required', 'string', 'max:100', 'unique:{{ table }},sku'],
+            'description' => ['nullable', 'string'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'stock' => ['required', 'integer', 'min:0'],
+            'weight' => ['nullable', 'numeric', 'min:0'],
+            'is_active' => ['required', 'boolean'],
         ];
     }
-
 
     public function toDto(): {{ crud }}{{ model }}DTO
     {
         return new {{ crud }}{{ model }}DTO(
-          file: $this->file('file'),
+
+            attributes: $this->validated(),
+            //  name: $this->string('name')->toString(),
 
         );
     }
-
-
-
 }

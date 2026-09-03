@@ -1,0 +1,32 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Database\Factories;
+
+use App\Models\{{ model }};
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends Factory<{{ model }}>
+ */
+final class {{ model }}Factory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->words(3, true),
+            'sku' => fake()->unique()->bothify('PRD-#####'),
+            'description' => fake()->optional()->paragraph(),
+            'price' => fake()->randomFloat(2, 1000, 10000000),
+            'stock' => fake()->numberBetween(0, 1000),
+            'weight' => fake()->optional()->randomFloat(2, 0.1, 100),
+            'is_active' => true,
+        ];
+    }
+}

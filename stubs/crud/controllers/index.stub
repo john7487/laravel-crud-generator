@@ -27,8 +27,6 @@ final class {{ crud }}Controller
             ->paginate()
             ->appends(request()->query());
 
-           
-
         return $this->successCollection({{ model }}Resource::collection(${{ table }}));
     }
 }

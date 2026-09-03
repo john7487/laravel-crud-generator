@@ -1,0 +1,17 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers\Api{{ controller_namespace }}\{{ model }};
+
+use App\Actions\{{ model }}\{{ crud }}{{ model }}Action;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+
+final class ExportController
+{
+    public function __invoke(
+        {{ crud }}{{ model }}Action $action,
+    ): StreamedResponse {
+        return $action->execute();
+    }
+}

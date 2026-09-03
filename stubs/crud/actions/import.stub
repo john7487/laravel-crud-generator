@@ -1,0 +1,97 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Actions\{{ model }};
+
+use App\DTOs\{{ model }}\{{ crud }}{{ model }}DTO;
+use App\Models\{{ model }};
+use Illuminate\Support\Facades\DB;
+use RuntimeException;
+
+final class {{ crud }}{{ model }}Action
+{
+    /**
+     * @return array<string, int<0, max>>
+     */
+    public function execute({{ crud }}{{ model }}DTO $data): array
+    {
+
+        $rows = $this->readCsv($data);
+
+        DB::transaction(function () use ($rows): void {
+            {{ model }}::query()->delete();
+            {{ model }}::query()->insert($rows);
+        });
+
+        return [
+            'inserted' => count($rows),
+        ];
+    }
+
+    /**
+     * @return array<int, array<mixed>>
+     */
+    private function readCsv(
+        {{ crud }}{{ model }}DTO $data
+    ): array {
+        $handle = fopen($data->file->getRealPath(), 'r');
+
+        throw_if($handle === false,
+            RuntimeException::class,
+            'Unable to read CSV.',
+        );
+
+        $header = fgetcsv($handle, 0, ';', escape: '\\');
+
+        if ($header === false) {
+            throw new RuntimeException('CSV header not found.');
+        }
+
+        $header = array_map(
+            $this->removeBom(...),
+            $header,
+        );
+
+        if ($header !== [
+            'id',
+            'name',
+            'sku',
+            'description',
+            'price',
+            'stock',
+            'weight',
+            'is_active',
+        ]) {
+            throw new RuntimeException(
+                'Invalid CSV header.'
+            );
+        }
+
+        $rows = [];
+
+        while (($row = fgetcsv($handle, 0, ';', escape: '\\')) !== false) {
+            $rows[] = [
+                'id' => $row[0],
+                'name' => $row[1],
+                'sku' => $row[2],
+                'description' => $row[3],
+                'price' => $row[4],
+                'stock' => $row[5],
+                'weight' => $row[6],
+                'is_active' => $row[7],
+            ];
+        }
+
+        fclose($handle);
+
+        return $rows;
+    }
+
+    private function removeBom(?string $value): string
+    {
+
+        return preg_replace('/^\xEF\xBB\xBF/', '', $value ?? '') ?? '';
+
+    }
+}
