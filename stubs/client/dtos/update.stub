@@ -1,0 +1,22 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\DTOs\{{ model }};
+
+final readonly class {{ crud }}{{ model }}DTO
+{
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
+    public function __construct(
+        public array $attributes,
+        // public string $name,
+        // public string $sku,
+        // public ?string $description,
+        // public string $price,
+        // public int $stock,
+        // public ?string $weight,
+        // public bool $isActive,
+    ) {}
+}

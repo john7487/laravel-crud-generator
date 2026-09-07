@@ -7,13 +7,13 @@ use AltenJohn\CrudGenerator\Enums\CrudAction;
 use AltenJohn\CrudGenerator\Enums\CrudFileType;
 use AltenJohn\CrudGenerator\Enums\CrudStaticFileType;
 
-final class CrudDefinition
+final class ClientDefinition
 {
 
 
 public static function definitions(): array
 {
-    $definitions = CrudFileDefinitions::base();
+    $definitions = ClientFileDefinitions::base();
 
     foreach (CrudAction::cases() as $action) {
         foreach (self::filesFor($action) as $fileType) {

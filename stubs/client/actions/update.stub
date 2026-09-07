@@ -1,0 +1,24 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Actions\{{ model }};
+
+use App\DTOs\{{ model }}\{{ crud }}{{ model }}DTO;
+use App\Models\{{ model }};
+
+final class {{ crud }}{{ model }}Action
+{
+    /**
+     * @return array<string, {{ model }}>
+     */
+    public function execute({{ crud }}{{ model }}DTO $data, {{ model }} ${{ variable }}): array
+    {
+
+        ${{ variable }}->Update($data->attributes);
+
+        return [
+            '{{ variable }}' => ${{ variable }},
+        ];
+    }
+}

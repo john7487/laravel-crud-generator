@@ -1,0 +1,174 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Models\{{ model }};
+use Illuminate\Http\UploadedFile;
+
+it('can import {{ table }} from csv', function (): void {
+    $csv = implode("\n", [
+        'id;name;sku;description;price;stock;weight;is_active',
+        '1;{{ model }} One;PRD-001;Description One;10000;10;1.25;1',
+        '2;{{ model }} Two;PRD-002;Description Two;20000;20;2.50;1',
+        '3;{{ model }} Three;PRD-003;Description Three;30000;30;3.75;0',
+        '4;{{ model }} Four;PRD-004;Description Four;40000;40;4.00;1',
+        '5;{{ model }} Five;PRD-005;Description Five;50000;50;5.50;1',
+    ]);
+
+    $file = UploadedFile::fake()->createWithContent(
+        '{{ table }}.csv',
+        $csv,
+    );
+
+    $response = $this->post('/api/{{ route_path }}/{{ table }}/import', [
+        'file' => $file,
+    ]);
+
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'meta' => [
+                'request_id',
+                'version',
+                'timestamp',
+                'inserted',
+            ],
+        ])
+        ->assertJsonPath('meta.inserted', 5);
+
+    $this->assertDatabaseCount('{{ table }}', 5);
+
+    $this->assertDatabaseHas('{{ table }}', [
+        'id' => 1,
+        'name' => '{{ model }} One',
+        'sku' => 'PRD-001',
+        'stock' => 10,
+    ]);
+
+    $this->assertDatabaseHas('{{ table }}', [
+        'id' => 5,
+        'name' => '{{ model }} Five',
+        'sku' => 'PRD-005',
+        'stock' => 50,
+    ]);
+});
+
+it('replaces existing {{ table }} when importing csv', function (): void {
+    {{ model }}::factory()->create([
+        'id' => 100,
+        'name' => 'Old {{ model }} One',
+        'sku' => 'OLD-001',
+    ]);
+
+    {{ model }}::factory()->create([
+        'id' => 101,
+        'name' => 'Old {{ model }} Two',
+        'sku' => 'OLD-002',
+    ]);
+
+    $csv = implode("\n", [
+        'id;name;sku;description;price;stock;weight;is_active',
+        '1;{{ model }} One;PRD-001;Description One;10000;10;1.25;1',
+        '2;{{ model }} Two;PRD-002;Description Two;20000;20;2.50;1',
+    ]);
+
+    $file = UploadedFile::fake()->createWithContent(
+        '{{ table }}.csv',
+        $csv,
+    );
+
+    $response = $this->post('/api/{{ route_path }}/{{ table }}/import', [
+        'file' => $file,
+    ]);
+
+    $response
+        ->assertSuccessful()
+        ->assertJsonPath('meta.inserted', 2);
+
+    $this->assertDatabaseMissing('{{ table }}', [
+        'sku' => 'OLD-001',
+    ]);
+
+    $this->assertDatabaseMissing('{{ table }}', [
+        'sku' => 'OLD-002',
+    ]);
+
+    $this->assertDatabaseHas('{{ table }}', [
+        'id' => 1,
+        'sku' => 'PRD-001',
+    ]);
+
+    $this->assertDatabaseHas('{{ table }}', [
+        'id' => 2,
+        'sku' => 'PRD-002',
+    ]);
+
+    $this->assertDatabaseCount('{{ table }}', 2);
+});
+
+it('requires a file when importing {{ table }}', function (): void {
+    $response = $this->post('/api/{{ route_path }}/{{ table }}/import', []);
+
+    $response->assertUnprocessable();
+
+    $errors = $response->json('errors');
+
+    expect(
+        collect($errors)
+            ->pluck('source.pointer')
+            ->all()
+    )->toContain('/data/attributes/file');
+});
+
+it('rejects unsupported file types when importing {{ table }}', function (): void {
+    $file = UploadedFile::fake()->create(
+        '{{ table }}.xlsx',
+        100,
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+
+    $response = $this->post('/api/{{ route_path }}/{{ table }}/import', [
+        'file' => $file,
+    ]);
+
+    $response->assertUnprocessable();
+
+    $errors = $response->json('errors');
+
+    expect(
+        collect($errors)
+            ->pluck('source.pointer')
+            ->all()
+    )->toContain('/data/attributes/file');
+});
+
+it('rejects csv with invalid header', function (): void {
+    $csv = implode("\n", [
+        'id;name;sku;wrong_column;price;stock;weight;is_active',
+        '1;{{ model }} One;PRD-001;Description One;10000;10;1.25;1',
+    ]);
+
+    $file = UploadedFile::fake()->createWithContent(
+        '{{ table }}.csv',
+        $csv,
+    );
+
+    $response = $this->post('/api/{{ route_path }}/{{ table }}/import', [
+        'file' => $file,
+    ]);
+
+    $response->assertServerError();
+});
+
+it('rejects empty csv file', function (): void {
+    $file = UploadedFile::fake()->createWithContent(
+        '{{ table }}.csv',
+        '',
+    );
+
+    $response = $this->post('/api/{{ route_path }}/{{ table }}/import', [
+        'file' => $file,
+    ]);
+
+    $response->assertServerError();
+});

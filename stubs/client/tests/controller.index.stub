@@ -1,0 +1,43 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Models\{{ model }};
+
+test('example', function (): void {
+    $response = $this->get('/api/{{ route_path }}/{{ table }}');
+
+    $response->assertStatus(200);
+});
+
+it('can list {{ table }}', function (): void {
+    {{ model }}::factory()->count(3)->create();
+
+    $response = $this->get('/api/{{ route_path }}/{{ table }}');
+
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'type',
+                    'id',
+                    'attributes',
+                ],
+            ],
+        ]);
+
+    expect($response->json('data'))->toHaveCount(3);
+});
+
+it('returns empty data when there are no {{ table }}', function (): void {
+    $response = $this->get('/api/{{ route_path }}/{{ table }}');
+
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'data',
+        ]);
+
+    expect($response->json('data'))->toBeArray()->toBeEmpty();
+});

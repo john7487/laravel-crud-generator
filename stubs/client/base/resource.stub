@@ -1,0 +1,38 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Resources\Api{{ controller_namespace }};
+
+use App\Models\{{ model }};
+use Illuminate\Http\Resources\JsonApi\JsonApiResource;
+
+/**
+ * @property-read {{ model }} $resource
+ */
+final class {{ model }}Resource extends JsonApiResource
+{
+    /**
+     * The resource's attributes.
+     *
+     * @var list<string>
+     */
+    public array $attributes = [
+        'name',
+        'sku',
+        'description',
+        'price',
+        'stock',
+        'weight',
+        'is_active',
+    ];
+
+    /**
+     * The resource's relationships.
+     *
+     * @var list<string> | array<string, class-string>
+     */
+    public array $relationships = [
+        //
+    ];
+}

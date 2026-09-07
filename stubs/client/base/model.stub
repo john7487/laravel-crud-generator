@@ -1,0 +1,43 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Models;
+
+use Database\Factories\{{ model }}Factory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+// use Illuminate\Database\Eloquent\Attributes\Table;
+
+#[Fillable([
+    'name',
+    'sku',
+    'description',
+    'price',
+    'stock',
+    'weight',
+    'is_active',
+])]
+
+// #[Table(
+//     keyType: 'string',
+//     incrementing: false ,
+//     timestamps: false
+// )]
+
+final class {{ model }} extends Model
+{
+    /** @use HasFactory<{{ model }}Factory> */
+    use HasFactory;
+
+    protected function casts(): array
+    {
+        return [
+            'price' => 'decimal:2',
+            'weight' => 'decimal:2',
+            'is_active' => 'boolean',
+        ];
+    }
+}

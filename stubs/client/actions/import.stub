@@ -53,7 +53,16 @@ final class {{ crud }}{{ model }}Action
             $header,
         );
 
-        if ($header !== ['id', 'name', 'sku', 'description', 'price', 'stock', 'weight', 'is_active']) {
+        if ($header !== [
+            'id',
+            'name',
+            'sku',
+            'description',
+            'price',
+            'stock',
+            'weight',
+            'is_active',
+        ]) {
             throw new RuntimeException(
                 'Invalid CSV header.'
             );

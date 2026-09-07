@@ -1,0 +1,33 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Actions\{{ model }};
+
+use App\Models\{{ model }};
+use Illuminate\Support\Collection;
+use Spatie\QueryBuilder\QueryBuilder;
+
+final class {{ crud }}{{ model }}Action
+{
+    /**
+     * @return array{products: Collection<int, {{ model }}>}
+     */
+    public function execute(): array
+    {
+
+        ${{ table }} = QueryBuilder::for({{ model }}::class)
+        //    ->allowedFilters(
+        //        AllowedFilter::partial('name'),
+        //     )
+
+            ->get();
+        //    ->defaultSort('id')
+        //    ->paginate()
+        //    ->appends(request()->query());
+
+        return [
+            '{{ table }}' => ${{ table }},
+        ];
+    }
+}
