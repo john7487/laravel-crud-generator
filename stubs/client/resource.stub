@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Resources\Api{{ controller_namespace }};
 
-use App\Models\{{ model }};
+use App\DTOs\{{ model }}\Data{{ model }}DTO;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\JsonApi\JsonApiResource;
 
 /**
- * @property-read {{ model }} $resource
+ * @property Data{{ model }}DTO $resource
  */
 final class {{ model }}Resource extends JsonApiResource
 {
@@ -35,4 +36,9 @@ final class {{ model }}Resource extends JsonApiResource
     public array $relationships = [
         //
     ];
+
+    public function toId(Request $request): string
+    {
+        return $this->resource->id;
+    }
 }

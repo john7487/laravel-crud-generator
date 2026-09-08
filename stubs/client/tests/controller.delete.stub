@@ -2,24 +2,17 @@
 
 declare(strict_types=1);
 
-use App\Models\{{ model }};
+use App\Contracts\{{ model }}\{{ model }}ClientContract;
 
 it('can delete a {{ variable }}', function (): void {
-    ${{ variable }} = {{ model }}::factory()->create();
+    $this->mock({{ model }}ClientContract::class, function ($mock): void {
+        $mock
+            ->shouldReceive('delete')
+            ->once()
+            ->with('1');
+    });
 
-    $response = $this->delete(
-        "/api/{{ route_path }}/{{ table }}/{${{ variable }}->id}"
-    );
+    $response = $this->delete('/api/v1/{{ table }}/1');
 
     $response->assertSuccessful();
-
-    $this->assertDatabaseMissing('{{ table }}', [
-        'id' => ${{ variable }}->id,
-    ]);
-});
-
-it('returns not found when deleting a {{ variable }} that does not exist', function (): void {
-    $response = $this->delete('/api/{{ route_path }}/{{ table }}/999999');
-
-    $response->assertNotFound();
 });

@@ -2,7 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Models\{{ model }};
+use App\Contracts\{{ model }}\{{ model }}ClientContract;
+use App\DTOs\{{ model }}\Data{{ model }}DTO;
 
 it('can store a {{ variable }}', function (): void {
     $payload = [
@@ -15,7 +16,26 @@ it('can store a {{ variable }}', function (): void {
         'is_active' => true,
     ];
 
-    $response = $this->post('/api/{{ route_path }}/{{ table }}', $payload);
+    ${{ variable }} = new Data{{ model }}DTO(
+        id: '1',
+        name: 'Test {{ model }}',
+        sku: 'PRD-001',
+        description: '{{ model }} description',
+        price: '150000.50',
+        stock: 100,
+        weight: '1.25',
+        is_active: true,
+    );
+
+    $this->mock({{ model }}ClientContract::class, function ($mock) use ($payload, ${{ variable }}): void {
+        $mock
+            ->shouldReceive('store')
+            ->once()
+            ->with($payload)
+            ->andReturn(${{ variable }});
+    });
+
+    $response = $this->post('/api/v1/{{ table }}', $payload);
 
     $response
         ->assertSuccessful()
@@ -23,21 +43,25 @@ it('can store a {{ variable }}', function (): void {
             'data' => [
                 'type',
                 'id',
-                'attributes',
+                'attributes' => [
+                    'name',
+                    'sku',
+                    'description',
+                    'price',
+                    'stock',
+                    'weight',
+                    'is_active',
+                ],
             ],
-        ]);
-
-    $this->assertDatabaseHas('{{ table }}', [
-        'name' => 'Test {{ model }}',
-        'sku' => 'PRD-001',
-        'stock' => 100,
-    ]);
-
-    expect({{ model }}::query()->count())->toBe(1);
+        ])
+        ->assertJsonPath('data.id', '1')
+        ->assertJsonPath('data.attributes.name', 'Test {{ model }}')
+        ->assertJsonPath('data.attributes.sku', 'PRD-001')
+        ->assertJsonPath('data.attributes.stock', 100);
 });
 
 it('requires required fields when storing a {{ variable }}', function (): void {
-    $response = $this->post('/api/{{ route_path }}/{{ table }}', []);
+    $response = $this->post('/api/v1/{{ table }}', []);
 
     $response->assertUnprocessable();
 
@@ -50,32 +74,4 @@ it('requires required fields when storing a {{ variable }}', function (): void {
         ->assertJsonPath('errors.3.source.pointer', '/data/attributes/stock')
         ->assertJsonPath('errors.4.source.pointer', '/data/attributes/is_active');
 
-});
-
-it('requires a unique sku when storing a {{ variable }}', function (): void {
-    {{ model }}::factory()->create([
-        'sku' => 'PRD-001',
-    ]);
-
-    $payload = [
-        'name' => 'Another {{ model }}',
-        'sku' => 'PRD-001',
-        'description' => '{{ model }} description',
-        'price' => 150000.50,
-        'stock' => 100,
-        'weight' => 1.25,
-        'is_active' => true,
-    ];
-
-    $response = $this->post('/api/{{ route_path }}/{{ table }}', $payload);
-
-    $response->assertUnprocessable();
-
-    $errors = $response->json('errors');
-
-    expect(
-        collect($errors)
-            ->pluck('source.pointer')
-            ->all()
-    )->toContain('/data/attributes/sku');
 });

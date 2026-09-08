@@ -25,20 +25,88 @@ public static function resolve(
     }; 
 }
 
-
 /**
  * @return array<int, GeneratorDefinition>
  */
 public static function base(): array
 {
     return [
-      //  self::model(),
-       // self::factory(),
+        self::client(),
+        self::contract(),
+        self::dtoData(),
         self::resource(),
-      //  self::migration(),
         self::route(),
+        self::testUnit(),
     ];
 }
+
+///////////// BAGIAN BASE FILE ////////////////////////////////////
+    private static function client(): GeneratorDefinition
+    {
+        return new GeneratorDefinition(
+            name: 'Client',
+            stub: 'client/client.stub',
+            directory: 'app/Clients',
+            filename: '{{ model }}/{{ model }}Client.php',
+            crud: '',
+        );
+    }
+
+    private static function contract(): GeneratorDefinition
+    {
+        return new GeneratorDefinition(
+            name: 'Contract',
+            stub: 'client/contract.stub',
+            directory: 'app/Contracts',
+            filename: '{{ model }}/{{ model }}ClientContract.php',
+            crud: '',
+        );
+    }
+
+    private static function dtoData(): GeneratorDefinition {
+        return new GeneratorDefinition(  
+            name: 'DataDTOs',
+            stub: 'client/dto/data.stub',
+            directory: 'app/DTOs/{{ model }}',
+            filename: 'Data{{ model }}DTO.php',
+            crud: '',
+        );
+    }
+
+    private static function resource(): GeneratorDefinition
+    {
+        return new GeneratorDefinition(
+            name: 'Resource',
+            stub: 'client/resource.stub',
+            directory: 'app/Http/Resources',
+            filename: 'Api/{{ controller }}Resource.php',
+            crud: '',
+        );
+    }
+
+    private static function route(): GeneratorDefinition
+    {
+        return new GeneratorDefinition(
+            name: 'Route',
+            stub: 'crud/base/route.stub',
+            directory: 'routes/api',
+            filename: '{{ route_path }}/{{ variable }}.php',
+            crud: '',
+        );
+    }
+
+    private static function testUnit(): GeneratorDefinition {
+        return new GeneratorDefinition(
+            name: 'TestClientUnit',
+            stub: 'client/tests/unit.client.stub',
+            directory: 'tests/Unit',
+            filename: 'Clients/{{ model }}/{{ model }}ClientTest.php',
+            crud: '',
+        );
+    }
+
+
+/////////////////////////////// SAMBIL DARI CRUD ////////////////////////////////////////////////
 
 
     private static function controller(
@@ -46,12 +114,27 @@ public static function base(): array
     ): GeneratorDefinition {
         return new GeneratorDefinition(
             name: $action->value.'Controller',
-            stub: 'client/controllers/'.Str::lower($action->value).'.stub',
+            stub: 'crud/controllers/'.Str::lower($action->value).'.stub',
             directory: 'app/Http/Controllers',
             filename: 'Api/{{ controller }}/{{ crud }}Controller.php',
             crud: $action->value,
         );
     }
+
+    private static function dto(
+        CrudAction $action,
+    ): GeneratorDefinition {
+        return new GeneratorDefinition(  
+            name: $action->value.'DTOs',
+            stub: 'crud/dtos/'.Str::lower($action->value).'.stub',
+            directory: 'app/DTOs/{{ model }}',
+            filename: $action->value.'{{ model }}DTO.php',
+            crud: $action->value,
+        );
+    }
+
+
+    /////////////////////// REQUES BUAT SENDIRI KARENA VALIDASI UNIQ //////////////////
 
     private static function request(
         CrudAction $action,
@@ -65,17 +148,7 @@ public static function base(): array
         );
     }
 
-    private static function dto(
-        CrudAction $action,
-    ): GeneratorDefinition {
-        return new GeneratorDefinition(  
-            name: $action->value.'DTOs',
-            stub: 'client/dtos/'.Str::lower($action->value).'.stub',
-            directory: 'app/DTOs/{{ model }}',
-            filename: $action->value.'{{ model }}DTO.php',
-            crud: $action->value,
-        );
-    }
+///////////////////////////////  BAGIAN CLIENT /////////////////////
 
     private static function action(
         CrudAction $action,
@@ -98,67 +171,6 @@ public static function base(): array
             directory: 'tests/Feature',
             filename: 'Api/{{ controller }}/{{ crud }}ControllerTest.php',
             crud: $action->value,
-        );
-    }
-
-
-    // private static function model(): GeneratorDefinition
-    // {
-    //     return new GeneratorDefinition(
-    //         name: 'Model',
-    //         stub: 'client/base/model.stub',
-    //         directory: 'app/Models',
-    //         filename: '{{ model }}.php',
-    //         crud: '',
-    //     );
-    // }
-
-
-    // private static function factory(): GeneratorDefinition
-    // {
-    //     return new GeneratorDefinition(
-    //         name: 'Factory',
-    //         stub: 'client/base/factory.stub',
-    //         directory: 'database/factories',
-    //         filename: '{{ model }}Factory.php',
-    //         crud: '',
-    //     );
-    // }
-
-
-    private static function resource(): GeneratorDefinition
-    {
-        return new GeneratorDefinition(
-            name: 'Resource',
-            stub: 'client/base/resource.stub',
-            directory: 'app/Http/Resources',
-            filename: 'Api/{{ controller }}Resource.php',
-            crud: '',
-        );
-    }
-
-
-    // private static function migration(): GeneratorDefinition
-    // {
-    //     return new GeneratorDefinition(
-    //         name: 'Migration',
-    //         stub: 'client/base/migration.stub',
-    //         directory: 'database/migrations',
-    //         filename: 'create_{{ table }}_table.php',
-    //         crud: '',
-    //         timestamp: true,
-    //         option: 'migration',
-    //     );
-    // }
-
-    private static function route(): GeneratorDefinition
-    {
-        return new GeneratorDefinition(
-            name: 'Route',
-            stub: 'client/base/route.stub',
-            directory: 'routes/api',
-            filename: '{{ route_path }}/{{ variable }}.php',
-            crud: '',
         );
     }
 

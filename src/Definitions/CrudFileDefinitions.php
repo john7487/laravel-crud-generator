@@ -40,7 +40,6 @@ public static function base(): array
     ];
 }
 
-
     private static function controller(
         CrudAction $action,
     ): GeneratorDefinition {
@@ -101,7 +100,6 @@ public static function base(): array
         );
     }
 
-
     private static function model(): GeneratorDefinition
     {
         return new GeneratorDefinition(
@@ -112,7 +110,6 @@ public static function base(): array
             crud: '',
         );
     }
-
 
     private static function factory(): GeneratorDefinition
     {
@@ -125,7 +122,6 @@ public static function base(): array
         );
     }
 
-
     private static function resource(): GeneratorDefinition
     {
         return new GeneratorDefinition(
@@ -136,7 +132,6 @@ public static function base(): array
             crud: '',
         );
     }
-
 
     private static function migration(): GeneratorDefinition
     {

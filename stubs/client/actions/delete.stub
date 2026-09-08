@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace App\Actions\{{ model }};
 
-use App\Models\{{ model }};
+use App\Contracts\{{ model }}\{{ model }}ClientContract;
 
-final class {{ crud }}{{ model }}Action
+final readonly class {{ crud }}{{ model }}Action
 {
-    public function execute({{ model }} ${{ variable }}): void
+    public function __construct(
+        private {{ model }}ClientContract $client,
+    ) {}
+
+    public function execute(string ${{ variable }}): void
     {
 
-        ${{ variable }}->delete();
+        $this->client->delete(${{ variable }});
 
     }
 }

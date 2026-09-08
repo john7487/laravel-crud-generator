@@ -4,27 +4,22 @@ declare(strict_types=1);
 
 namespace App\Actions\{{ model }};
 
-use App\Models\{{ model }};
-use Illuminate\Support\Collection;
-use Spatie\QueryBuilder\QueryBuilder;
+use App\Contracts\{{ model }}\{{ model }}ClientContract;
+use App\DTOs\{{ model }}\Data{{ model }}DTO;
 
-final class {{ crud }}{{ model }}Action
+final readonly class {{ crud }}{{ model }}Action
 {
+    public function __construct(
+        private {{ model }}ClientContract $client,
+    ) {}
+
     /**
-     * @return array{products: Collection<int, {{ model }}>}
+     * @return array{{{ table }}: list<Data{{ model }}DTO>}
      */
     public function execute(): array
     {
 
-        ${{ table }} = QueryBuilder::for({{ model }}::class)
-        //    ->allowedFilters(
-        //        AllowedFilter::partial('name'),
-        //     )
-
-            ->get();
-        //    ->defaultSort('id')
-        //    ->paginate()
-        //    ->appends(request()->query());
+        ${{ table }} = $this->client->index();
 
         return [
             '{{ table }}' => ${{ table }},

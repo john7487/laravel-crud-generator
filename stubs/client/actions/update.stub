@@ -4,21 +4,24 @@ declare(strict_types=1);
 
 namespace App\Actions\{{ model }};
 
+use App\Contracts\{{ model }}\{{ model }}ClientContract;
+use App\DTOs\{{ model }}\Data{{ model }}DTO;
 use App\DTOs\{{ model }}\{{ crud }}{{ model }}DTO;
-use App\Models\{{ model }};
 
-final class {{ crud }}{{ model }}Action
+final readonly class {{ crud }}{{ model }}Action
 {
+    public function __construct(
+        private {{ model }}ClientContract $client,
+    ) {}
+
     /**
-     * @return array<string, {{ model }}>
+     * @return array{{{ variable }}: Data{{ model }}DTO}
      */
-    public function execute({{ crud }}{{ model }}DTO $data, {{ model }} ${{ variable }}): array
+    public function execute({{ crud }}{{ model }}DTO $data, string ${{ variable }}): array
     {
 
-        ${{ variable }}->Update($data->attributes);
-
         return [
-            '{{ variable }}' => ${{ variable }},
+            '{{ variable }}' => $this->client->update($data->attributes, ${{ variable }}),
         ];
     }
 }

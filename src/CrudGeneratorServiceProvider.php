@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AltenJohn\CrudGenerator;
 
+use AltenJohn\CrudGenerator\Commands\DeleteClientCommand;
 use AltenJohn\CrudGenerator\Commands\DeleteCrudCommand;
 use AltenJohn\CrudGenerator\Commands\MakeClientCommand;
 use AltenJohn\CrudGenerator\Commands\MakeCrudCommand;
@@ -18,6 +19,7 @@ final class CrudGeneratorServiceProvider extends ServiceProvider
                 MakeCrudCommand::class,
                 DeleteCrudCommand::class,
                 MakeClientCommand::class,
+                DeleteClientCommand::class,
             ]);
         }
     }

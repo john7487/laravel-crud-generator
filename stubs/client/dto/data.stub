@@ -1,0 +1,20 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\DTOs\{{ model }};
+
+final readonly class Data{{ model }}DTO
+{
+    public function __construct(
+        public string $id,
+        public string $name,
+        public string $sku,
+        public ?string $description,
+        public string $price,
+        public int $stock,
+        public ?string $weight,
+        public bool $is_active,
+    ) {}
+
+}

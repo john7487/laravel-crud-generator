@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api{{ controller_namespace }}\{{ model }};
 
 use App\Actions\{{ model }}\{{ crud }}{{ model }}Action;
-use App\Models\{{ model }};
 use App\Traits\ApiResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -13,7 +12,7 @@ final class {{ crud }}Controller
 {
     use ApiResponse;
 
-    public function __invoke({{ crud }}{{ model }}Action $action, {{ model }} ${{ variable }}): Response
+    public function __invoke({{ crud }}{{ model }}Action $action, string ${{ variable }}): Response
     {
 
         $action->execute(${{ variable }});

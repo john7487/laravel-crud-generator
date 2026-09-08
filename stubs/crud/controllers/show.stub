@@ -6,7 +6,6 @@ namespace App\Http\Controllers\Api{{ controller_namespace }}\{{ model }};
 
 use App\Actions\{{ model }}\{{ crud }}{{ model }}Action;
 use App\Http\Resources\Api{{ controller_namespace }}\{{ model }}Resource;
-use App\Models\{{ model }};
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 
@@ -14,7 +13,7 @@ final class {{ crud }}Controller
 {
     use ApiResponse;
 
-    public function __invoke({{ crud }}{{ model }}Action $action, {{ model }} ${{ variable }}): JsonResponse
+    public function __invoke({{ crud }}{{ model }}Action $action, string ${{ variable }}): JsonResponse
     {
         $result = $action->execute(${{ variable }});
 

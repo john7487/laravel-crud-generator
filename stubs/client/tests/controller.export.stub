@@ -2,45 +2,76 @@
 
 declare(strict_types=1);
 
-use App\Models\{{ model }};
+use App\Contracts\{{ model }}\{{ model }}ClientContract;
+use GuzzleHttp\Psr7\Response as PsrResponse;
+use Illuminate\Http\Client\Response;
 
-it('can export {{ table }} to csv', function (): void {
-    {{ model }}::factory()->create([
-        'name' => '{{ model }} A',
-        'sku' => 'SKU-001',
-        'description' => 'Description A',
-        'price' => 10000,
-        'stock' => 10,
-        'weight' => 1.5,
-        'is_active' => true,
-    ]);
+it('can export {{ table }} with content disposition', function (): void {
+    $clientResponse = new Response(
+        new PsrResponse(
+            200,
+            [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename="{{ table }}.csv"',
+            ],
+            'id;name;sku',
+        ),
+    );
 
-    {{ model }}::factory()->create([
-        'name' => '{{ model }} B',
-        'sku' => 'SKU-002',
-        'description' => 'Description B',
-        'price' => 20000,
-        'stock' => 20,
-        'weight' => 2.5,
-        'is_active' => false,
-    ]);
+    $this->mock(
+        {{ model }}ClientContract::class,
+        function ($mock) use ($clientResponse): void {
+            $mock
+                ->shouldReceive('export')
+                ->once()
+                ->andReturn($clientResponse);
+        },
+    );
 
-    $response = $this->get('/api/{{ route_path }}/{{ table }}/export');
+    $response = $this->get('/api/v1/{{ table }}/export');
 
     $response
-        ->assertSuccessful()
-        ->assertHeader('content-type', 'text/csv; charset=UTF-8')
+        ->assertOk()
         ->assertHeader(
-            'content-disposition',
-            'attachment; filename={{ table }}.csv',
-        );
+            'Content-Type',
+            'text/csv; charset=utf-8',
+        )
+        ->assertHeader(
+            'Content-Disposition',
+            'attachment; filename="{{ table }}.csv"',
+        )
+        ->assertStreamedContent('id;name;sku');
+});
 
-    $content = $response->streamedContent();
+it('can export {{ table }} without content disposition', function (): void {
+    $clientResponse = new Response(
+        new PsrResponse(
+            200,
+            [
+                'Content-Type' => 'text/csv',
+            ],
+            'id;name;sku',
+        ),
+    );
 
-    expect($content)
-        ->toContain('id;name;sku;description;price;stock;weight;is_active')
-        ->toContain('{{ model }} A')
-        ->toContain('SKU-001')
-        ->toContain('{{ model }} B')
-        ->toContain('SKU-002');
+    $this->mock(
+        {{ model }}ClientContract::class,
+        function ($mock) use ($clientResponse): void {
+            $mock
+                ->shouldReceive('export')
+                ->once()
+                ->andReturn($clientResponse);
+        },
+    );
+
+    $response = $this->get('/api/v1/{{ table }}/export');
+
+    $response
+        ->assertOk()
+        ->assertHeader(
+            'Content-Type',
+            'text/csv; charset=utf-8',
+        )
+        ->assertHeaderMissing('Content-Disposition')
+        ->assertStreamedContent('id;name;sku');
 });

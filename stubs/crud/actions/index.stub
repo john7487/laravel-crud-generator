@@ -11,7 +11,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 final class {{ crud }}{{ model }}Action
 {
     /**
-     * @return array{products: Collection<int, {{ model }}>}
+     * @return array{{{ table }}: Collection<int, {{ model }}>}
      */
     public function execute(): array
     {

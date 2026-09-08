@@ -1,0 +1,346 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Clients\{{ model }}\{{ model }}Client;
+use App\DTOs\{{ model }}\Data{{ model }}DTO;
+use App\DTOs\{{ model }}\Import{{ model }}DTO;
+use Illuminate\Http\Client\RequestException;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Http;
+
+it('can fetch {{ table }} from {{ variable }} service', function (): void {
+    Http::fake([
+        '*' => Http::response([
+            'data' => [
+                [
+                    'type' => '{{ table }}',
+                    'id' => '1',
+                    'attributes' => [
+                        'name' => '{{ model }} One',
+                        'sku' => 'PRD-001',
+                        'description' => 'Description One',
+                        'price' => '10000',
+                        'stock' => 10,
+                        'weight' => '1.25',
+                        'is_active' => true,
+                    ],
+                ],
+                [
+                    'type' => '{{ table }}',
+                    'id' => '2',
+                    'attributes' => [
+                        'name' => '{{ model }} Two',
+                        'sku' => 'PRD-002',
+                        'description' => 'Description Two',
+                        'price' => '20000',
+                        'stock' => 20,
+                        'weight' => '2.50',
+                        'is_active' => true,
+                    ],
+                ],
+            ],
+        ]),
+    ]);
+
+    $client = new {{ model }}Client();
+
+    $result = $client->index();
+
+    expect($result)
+        ->toHaveCount(2)
+        ->each->toBeInstanceOf(Data{{ model }}DTO::class);
+
+    expect($result[0]->id)->toBe('1')
+        ->and($result[0]->name)->toBe('{{ model }} One')
+        ->and($result[0]->sku)->toBe('PRD-001')
+        ->and($result[0]->description)->toBe('Description One')
+        ->and($result[0]->price)->toBe('10000')
+        ->and($result[0]->stock)->toBe(10)
+        ->and($result[0]->weight)->toBe('1.25')
+        ->and($result[0]->is_active)->toBeTrue();
+
+    Http::assertSent(fn ($request): bool => $request->url() === config('services.{{ variable }}.url').'/{{ table }}'
+        && $request->method() === 'GET');
+});
+
+it('can store {{ variable }} through {{ variable }} service', function (): void {
+    Http::fake([
+        '*' => Http::response([
+            'data' => [
+                'type' => '{{ table }}',
+                'id' => '1',
+                'attributes' => [
+                    'name' => 'Test {{ model }}',
+                    'sku' => 'PRD-001',
+                    'description' => '{{ model }} description',
+                    'price' => '150000.50',
+                    'stock' => 100,
+                    'weight' => '1.25',
+                    'is_active' => true,
+                ],
+            ],
+        ], 201),
+    ]);
+
+    $client = new {{ model }}Client();
+
+    $result = $client->store([
+        'name' => 'Test {{ model }}',
+        'sku' => 'PRD-001',
+        'description' => '{{ model }} description',
+        'price' => 150000.50,
+        'stock' => 100,
+        'weight' => 1.25,
+        'is_active' => true,
+    ]);
+
+    expect($result)->toBeInstanceOf(Data{{ model }}DTO::class)
+        ->and($result->id)->toBe('1')
+        ->and($result->name)->toBe('Test {{ model }}')
+        ->and($result->sku)->toBe('PRD-001');
+});
+
+it('can fetch a {{ variable }} from {{ variable }} service', function (): void {
+    Http::fake([
+        '*' => Http::response([
+            'data' => [
+                'type' => '{{ table }}',
+                'id' => '1',
+                'attributes' => [
+                    'name' => '{{ model }} One',
+                    'sku' => 'PRD-001',
+                    'description' => 'Description One',
+                    'price' => '10000.00',
+                    'stock' => 10,
+                    'weight' => '1.25',
+                    'is_active' => true,
+                ],
+            ],
+        ]),
+    ]);
+
+    $client = new {{ model }}Client();
+
+    $result = $client->show('1');
+
+    expect($result)
+        ->toBeInstanceOf(Data{{ model }}DTO::class)
+        ->and($result->id)->toBe('1')
+        ->and($result->name)->toBe('{{ model }} One')
+        ->and($result->sku)->toBe('PRD-001');
+
+    Http::assertSent(fn ($request): bool => $request->method() === 'GET'
+        && $request->url() ===
+            config('services.{{ variable }}.url').'/{{ table }}/1');
+});
+
+it('throws exception when {{ variable }} service cannot find {{ variable }}', function (): void {
+    Http::fake([
+        '*' => Http::response([
+            'errors' => [
+                [
+                    'status' => '404',
+                    'title' => 'Not Found',
+                    'detail' => '{{ model }} not found.',
+                ],
+            ],
+        ], 404),
+    ]);
+
+    $client = new {{ model }}Client();
+
+    expect(
+        fn (): Data{{ model }}DTO => $client->show('999'),
+    )->toThrow(RequestException::class);
+});
+
+it('can update a {{ variable }} through {{ variable }} service', function (): void {
+    Http::fake([
+        '*' => Http::response([
+            'data' => [
+                'type' => '{{ table }}',
+                'id' => '1',
+                'attributes' => [
+                    'name' => 'Updated {{ model }}',
+                    'sku' => 'PRD-001',
+                    'description' => 'Updated description',
+                    'price' => '250000.00',
+                    'stock' => 150,
+                    'weight' => '2.00',
+                    'is_active' => true,
+                ],
+            ],
+        ]),
+    ]);
+
+    $client = new {{ model }}Client();
+
+    $result = $client->update([
+        'name' => 'Updated {{ model }}',
+        'sku' => 'PRD-001',
+        'description' => 'Updated description',
+        'price' => 250000,
+        'stock' => 150,
+        'weight' => 2,
+        'is_active' => true,
+    ], '1');
+
+    expect($result)
+        ->toBeInstanceOf(Data{{ model }}DTO::class)
+        ->and($result->id)->toBe('1')
+        ->and($result->name)->toBe('Updated {{ model }}')
+        ->and($result->sku)->toBe('PRD-001')
+        ->and($result->stock)->toBe(150);
+
+    // Http::assertSent(function ($request): bool {
+    //     return $request->method() === 'PUT'
+    //         && parse_url($request->url(), PHP_URL_PATH) === '/api/v1/product/1';
+    // });
+
+    Http::assertSent(fn ($request): bool => $request->method() === 'PUT'
+        && $request->url() ===
+            config('services.{{ variable }}.url').'/{{ table }}/1');
+});
+
+it('throws exception when {{ variable }} service rejects update', function (): void {
+    Http::fake([
+        '*' => Http::response([
+            'errors' => [
+                [
+                    'status' => '422',
+                    'title' => 'Validation Error',
+                    'detail' => 'The sku has already been taken.',
+                ],
+            ],
+        ], 422),
+    ]);
+
+    $client = new {{ model }}Client();
+
+    expect(
+        fn (): Data{{ model }}DTO => $client->update([
+            'name' => 'Updated {{ model }}',
+            'sku' => 'PRD-001',
+        ], '1'),
+    )->toThrow(RequestException::class);
+});
+
+it('can delete a {{ variable }} through {{ variable }} service', function (): void {
+    Http::fake([
+        '*' => Http::response(null, 204),
+    ]);
+
+    $client = new {{ model }}Client();
+
+    $client->delete('1');
+
+    Http::assertSent(fn ($request): bool => $request->method() === 'DELETE'
+        && $request->url() ===
+            config('services.{{ variable }}.url').'/{{ table }}/1');
+});
+
+it('can import {{ table }} through {{ variable }} service', function (): void {
+    Http::fake([
+        '*' => Http::response([
+            'meta' => [
+                'inserted' => 10,
+            ],
+        ]),
+    ]);
+
+    $file = UploadedFile::fake()->create(
+        '{{ table }}.csv',
+        10,
+        'text/csv',
+    );
+
+    $data = new Import{{ model }}DTO(
+        file: $file,
+    );
+
+    $client = new {{ model }}Client();
+
+    $result = $client->import($data);
+
+    expect($result)->toBe(10);
+
+    Http::assertSent(fn ($request): bool => $request->method() === 'POST'
+        && parse_url($request->url(), PHP_URL_PATH) === '/api/v1/{{ table }}/import'
+        && $request->hasFile('file'));
+});
+
+it('throws exception when import file cannot be opened', function (): void {
+    $file = mock(UploadedFile::class);
+
+    $file
+        ->shouldReceive('getRealPath')
+        ->once()
+        ->andReturn(
+            'C:\\__definitely_not_exists__\\{{ table }}.csv',
+        );
+
+    $data = new Import{{ model }}DTO(
+        file: $file,
+    );
+
+    $client = new {{ model }}Client();
+
+    expect(fn (): int => $client->import($data))
+        ->toThrow(
+            RuntimeException::class,
+            'Unable to read CSV.',
+        );
+});
+
+it('throws exception when import response is invalid', function (): void {
+    Http::fake([
+        '*' => Http::response([
+            'meta' => [
+                'inserted' => '10',
+            ],
+        ]),
+    ]);
+
+    $file = UploadedFile::fake()->create(
+        '{{ table }}.csv',
+        10,
+        'text/csv',
+    );
+
+    $data = new Import{{ model }}DTO(
+        file: $file,
+    );
+
+    $client = new {{ model }}Client();
+
+    expect(fn (): int => $client->import($data))
+        ->toThrow(
+            RuntimeException::class,
+            'Invalid import response.',
+        );
+});
+
+it('can export {{ table }} through {{ variable }} service', function (): void {
+    Http::fake([
+        '*' => Http::response(
+            'id;name;sku;description;price;stock;weight;is_active',
+            200,
+            [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename="{{ table }}.csv"',
+            ],
+        ),
+    ]);
+
+    $client = new {{ model }}Client();
+
+    $response = $client->export();
+
+    expect($response->status())->toBe(200)
+        ->and($response->body())
+        ->toBe('id;name;sku;description;price;stock;weight;is_active');
+
+    Http::assertSent(fn ($request): bool => $request->method() === 'GET'
+        && $request->url() === config('services.{{ variable }}.url').'/{{ table }}/export');
+});

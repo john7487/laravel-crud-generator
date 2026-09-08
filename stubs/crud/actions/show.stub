@@ -11,11 +11,11 @@ final class {{ crud }}{{ model }}Action
     /**
      * @return array<string, {{ model }}>
      */
-    public function execute({{ model }} ${{ variable }}): array
+    public function execute(string ${{ variable }}): array
     {
 
         return [
-            '{{ variable }}' => ${{ variable }},
+            '{{ variable }}' => {{ model }}::query()->findOrFail(${{ variable }}),
         ];
     }
 }

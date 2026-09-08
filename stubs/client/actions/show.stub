@@ -4,18 +4,24 @@ declare(strict_types=1);
 
 namespace App\Actions\{{ model }};
 
-use App\Models\{{ model }};
+use App\Contracts\{{ model }}\{{ model }}ClientContract;
+use App\DTOs\{{ model }}\Data{{ model }}DTO;
 
-final class {{ crud }}{{ model }}Action
+final readonly class {{ crud }}{{ model }}Action
 {
+    public function __construct(
+        private {{ model }}ClientContract $client,
+    ) {}
+
     /**
-     * @return array<string, {{ model }}>
+     * @return array{{{ variable }}: Data{{ model }}DTO}
      */
-    public function execute({{ model }} ${{ variable }}): array
+    public function execute(string ${{ variable }}): array
     {
+        $model = $this->client->show(${{ variable }});
 
         return [
-            '{{ variable }}' => ${{ variable }},
+            '{{ variable }}' => $model,
         ];
     }
 }

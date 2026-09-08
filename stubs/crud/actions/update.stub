@@ -7,18 +7,19 @@ namespace App\Actions\{{ model }};
 use App\DTOs\{{ model }}\{{ crud }}{{ model }}DTO;
 use App\Models\{{ model }};
 
-final class {{ crud }}{{ model }}Action
+final readonly class {{ crud }}{{ model }}Action
 {
     /**
-     * @return array<string, {{ model }}>
+     * @return array{{{ variable }}: {{ model }}}
      */
-    public function execute({{ crud }}{{ model }}DTO $data, {{ model }} ${{ variable }}): array
+    public function execute({{ crud }}{{ model }}DTO $data, string ${{ variable }}): array
     {
+        $model = {{ model }}::query()->findOrFail(${{ variable }});
 
-        ${{ variable }}->Update($data->attributes);
+        $model->update($data->attributes);
 
         return [
-            '{{ variable }}' => ${{ variable }},
+            '{{ variable }}' => $model,
         ];
     }
 }

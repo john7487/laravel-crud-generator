@@ -8,10 +8,10 @@ use App\Models\{{ model }};
 
 final class {{ crud }}{{ model }}Action
 {
-    public function execute({{ model }} ${{ variable }}): void
+    public function execute(string ${{ variable }}): void
     {
 
-        ${{ variable }}->delete();
+        {{ model }}::query()->findOrFail(${{ variable }})->delete();
 
     }
 }

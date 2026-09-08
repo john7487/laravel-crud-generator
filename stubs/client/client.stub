@@ -1,0 +1,204 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Clients\{{ model }};
+
+use App\Contracts\{{ model }}\{{ model }}ClientContract;
+use App\DTOs\{{ model }}\Data{{ model }}DTO;
+use App\DTOs\{{ model }}\Import{{ model }}DTO;
+use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\Response;
+use Illuminate\Support\Facades\Http;
+use RuntimeException;
+
+final readonly class {{ model }}Client implements {{ model }}ClientContract
+{
+    private PendingRequest $http;
+
+    public function __construct()
+    {
+        $url = config('services.{{ variable }}.url');
+
+        assert(is_string($url));
+
+        $this->http = Http::baseUrl($url)
+            ->acceptJson()
+            ->timeout(30);
+    }
+
+    public function index(array $query = []): array
+    {
+        $response = $this->http
+            ->get('/{{ table }}', $query)
+            ->throw();
+
+        /** @var list<array{
+         *     id: string,
+         *     attributes: array{
+         *         name: string,
+         *         sku: string,
+         *         description: string|null,
+         *         price: string,
+         *         stock: int,
+         *         weight: string|null,
+         *         is_active: bool
+         *     }
+         * }> $data
+         */
+        $data = $response->json('data');
+
+        return array_map(
+            $this->map{{ model }}(...),
+            $data,
+        );
+    }
+
+    public function store(array $data): Data{{ model }}DTO
+    {
+        $response = $this->http
+            ->post('/{{ table }}', $data)
+            ->throw();
+
+        /** @var array{
+         *     id: string,
+         *     attributes: array{
+         *         name: string,
+         *         sku: string,
+         *         description: string|null,
+         *         price: string,
+         *         stock: int,
+         *         weight: string|null,
+         *         is_active: bool
+         *     }
+         * } $item
+         */
+        $item = $response->json('data');
+
+        return $this->map{{ model }}($item);
+    }
+
+    public function show(string $id): Data{{ model }}DTO
+    {
+        $response = $this->http
+            ->get("/{{ table }}/{$id}")
+            ->throw();
+        /** @var array{
+         *     id: string,
+         *     attributes: array{
+         *         name: string,
+         *         sku: string,
+         *         description: string|null,
+         *         price: string,
+         *         stock: int,
+         *         weight: string|null,
+         *         is_active: bool
+         *     }
+         * } $item
+         */
+        $item = $response->json('data');
+
+        return $this->map{{ model }}($item);
+
+    }
+
+    public function update(array $data, string $id): Data{{ model }}DTO
+    {
+        $response = $this->http
+            ->put("/{{ table }}/{$id}", $data)
+            ->throw();
+        /** @var array{
+         *     id: string,
+         *     attributes: array{
+         *         name: string,
+         *         sku: string,
+         *         description: string|null,
+         *         price: string,
+         *         stock: int,
+         *         weight: string|null,
+         *         is_active: bool
+         *     }
+         * } $item
+         */
+        $item = $response->json('data');
+
+        return $this->map{{ model }}($item);
+
+    }
+
+    public function delete(string $id): void
+    {
+        $this->http
+            ->delete("/{{ table }}/{$id}")
+            ->throw();
+    }
+
+    public function import(Import{{ model }}DTO $data): int
+    {
+        $handle = @fopen(
+            $data->file->getRealPath(),
+            'r',
+        );
+
+        if ($handle === false) {
+            throw new RuntimeException('Unable to read CSV.');
+        }
+
+        try {
+            $result = $this->http
+                ->attach(
+                    'file',
+                    $handle,
+                    $data->file->getClientOriginalName(),
+                )
+                ->post('/{{ table }}/import')
+                ->throw()
+                ->json('meta.inserted');
+        } finally {
+            fclose($handle);
+        }
+
+        if (! is_int($result)) {
+            throw new RuntimeException(
+                'Invalid import response.',
+            );
+        }
+
+        return $result;
+    }
+
+    public function export(): Response
+    {
+        return $this->http
+            ->get('/{{ table }}/export')
+            ->throw();
+    }
+
+    /**
+     * @param array{
+     *     id: string,
+     *     attributes: array{
+     *         name: string,
+     *         sku: string,
+     *         description: string|null,
+     *         price: string,
+     *         stock: int,
+     *         weight: string|null,
+     *         is_active: bool
+     *     }
+     * } $item
+     */
+    private function map{{ model }}(array $item): Data{{ model }}DTO
+    {
+        return new Data{{ model }}DTO(
+            id: $item['id'],
+            name: $item['attributes']['name'],
+            sku: $item['attributes']['sku'],
+            description: $item['attributes']['description'],
+            price: $item['attributes']['price'],
+            stock: $item['attributes']['stock'],
+            weight: $item['attributes']['weight'],
+            is_active: $item['attributes']['is_active'],
+        );
+    }
+}

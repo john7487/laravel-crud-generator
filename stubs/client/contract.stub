@@ -1,0 +1,39 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Contracts\{{ model }};
+
+use App\DTOs\{{ model }}\Data{{ model }}DTO;
+use App\DTOs\{{ model }}\Import{{ model }}DTO;
+use Illuminate\Http\Client\Response;
+
+interface {{ model }}ClientContract
+{
+    /**
+     * @param  array<string, mixed>  $query
+     * @return list<Data{{ model }}DTO>
+     */
+    public function index(array $query = []): array;
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public function store(array $data): Data{{ model }}DTO;
+
+    public function show(string $id): Data{{ model }}DTO;
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public function update(array $data, string $id): Data{{ model }}DTO;
+
+    /**
+     * Delete a {{ model }} through the {{ model }} service.
+     */
+    public function delete(string $id): void;
+
+    public function import(Import{{ model }}DTO $data): int;
+
+    public function export(): Response;
+}

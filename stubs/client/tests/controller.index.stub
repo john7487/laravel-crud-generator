@@ -2,18 +2,51 @@
 
 declare(strict_types=1);
 
-use App\Models\{{ model }};
-
-test('example', function (): void {
-    $response = $this->get('/api/{{ route_path }}/{{ table }}');
-
-    $response->assertStatus(200);
-});
+use App\Contracts\{{ model }}\{{ model }}ClientContract;
+use App\DTOs\{{ model }}\Data{{ model }}DTO;
 
 it('can list {{ table }}', function (): void {
-    {{ model }}::factory()->count(3)->create();
+    ${{ table }} = [
+        new Data{{ model }}DTO(
+            id: '1',
+            name: '{{ model }} One',
+            sku: 'PRD-001',
+            description: 'Description One',
+            price: '10000',
+            stock: 10,
+            weight: '1.25',
+            is_active: true,
+        ),
+        new Data{{ model }}DTO(
+            id: '2',
+            name: '{{ model }} Two',
+            sku: 'PRD-002',
+            description: 'Description Two',
+            price: '20000',
+            stock: 20,
+            weight: '2.50',
+            is_active: true,
+        ),
+        new Data{{ model }}DTO(
+            id: '3',
+            name: '{{ model }} Three',
+            sku: 'PRD-003',
+            description: 'Description Three',
+            price: '30000',
+            stock: 30,
+            weight: '3.75',
+            is_active: false,
+        ),
+    ];
 
-    $response = $this->get('/api/{{ route_path }}/{{ table }}');
+    $this->mock({{ model }}ClientContract::class, function ($mock) use (${{ table }}): void {
+        $mock
+            ->shouldReceive('index')
+            ->once()
+            ->andReturn(${{ table }});
+    });
+
+    $response = $this->get('/api/v1/{{ table }}');
 
     $response
         ->assertSuccessful()
@@ -22,7 +55,15 @@ it('can list {{ table }}', function (): void {
                 '*' => [
                     'type',
                     'id',
-                    'attributes',
+                    'attributes' => [
+                        'name',
+                        'sku',
+                        'description',
+                        'price',
+                        'stock',
+                        'weight',
+                        'is_active',
+                    ],
                 ],
             ],
         ]);
@@ -31,7 +72,14 @@ it('can list {{ table }}', function (): void {
 });
 
 it('returns empty data when there are no {{ table }}', function (): void {
-    $response = $this->get('/api/{{ route_path }}/{{ table }}');
+    $this->mock({{ model }}ClientContract::class, function ($mock): void {
+        $mock
+            ->shouldReceive('index')
+            ->once()
+            ->andReturn([]);
+    });
+
+    $response = $this->get('/api/v1/{{ table }}');
 
     $response
         ->assertSuccessful()

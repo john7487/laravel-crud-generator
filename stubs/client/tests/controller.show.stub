@@ -2,15 +2,31 @@
 
 declare(strict_types=1);
 
-use App\Models\{{ model }};
+use App\Contracts\{{ model }}\{{ model }}ClientContract;
+use App\DTOs\{{ model }}\Data{{ model }}DTO;
 
-it('can show a {{ variable }}', function (): void {
-    ${{ variable }} = {{ model }}::factory()->create([
-        'name' => 'Test {{ model }}',
-        'sku' => 'PRD-001',
-    ]);
+it('can show a {{ model }}', function (): void {
 
-    $response = $this->get("/api/{{ route_path }}/{{ table }}/{${{ variable }}->id}");
+    ${{ variable }} = new Data{{ model }}DTO(
+        id: '1',
+        name: '{{ model }} One',
+        sku: 'PRD-001',
+        description: 'Description One',
+        price: '10000.00',
+        stock: 10,
+        weight: '1.25',
+        is_active: true,
+    );
+
+    $this->mock({{ model }}ClientContract::class, function ($mock) use (${{ variable }}): void {
+        $mock
+            ->shouldReceive('show')
+            ->once()
+            ->with('1')
+            ->andReturn(${{ variable }});
+    });
+
+    $response = $this->get('/api/v1/{{ table }}/1');
 
     $response
         ->assertSuccessful()
@@ -20,20 +36,8 @@ it('can show a {{ variable }}', function (): void {
                 'id',
                 'attributes',
             ],
-        ]);
-
-    expect($response->json('data.id'))
-        ->toBe((string) ${{ variable }}->id);
-
-    expect($response->json('data.attributes.name'))
-        ->toBe('Test {{ model }}');
-
-    expect($response->json('data.attributes.sku'))
-        ->toBe('PRD-001');
-});
-
-it('returns not found when {{ variable }} does not exist', function (): void {
-    $response = $this->get('/api/{{ route_path }}/{{ table }}/999999');
-
-    $response->assertNotFound();
+        ])
+        ->assertJsonPath('data.id', '1')
+        ->assertJsonPath('data.attributes.name', '{{ model }} One')
+        ->assertJsonPath('data.attributes.sku', 'PRD-001');
 });

@@ -2,8 +2,6 @@
 
 namespace AltenJohn\CrudGenerator\Commands;
 
-
-
 use AltenJohn\CrudGenerator\Definitions\CrudDefinition;
 //use AltenJohn\CrudGenerator\Definitions\CrudFileDefinitions;
 //use AltenJohn\CrudGenerator\Enums\CrudAction;

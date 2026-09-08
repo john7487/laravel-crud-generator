@@ -4,62 +4,35 @@ declare(strict_types=1);
 
 namespace App\Actions\{{ model }};
 
-use App\Models\{{ model }};
+use App\Contracts\{{ model }}\{{ model }}ClientContract;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-final class {{ crud }}{{ model }}Action
+final readonly class Export{{ model }}Action
 {
+    public function __construct(
+        private {{ model }}ClientContract $client,
+    ) {}
+
     public function execute(): StreamedResponse
     {
-        return response()->streamDownload(
-            function (): void {
-                $handle = fopen('php://output', 'w');
+        $response = $this->client->export();
 
-                assert($handle !== false);
+        $headers = [
+            'Content-Type' => $response->header('Content-Type'),
+        ];
 
-                fputcsv(
-                    $handle,
-                    [
-                        'id',
-                        'name',
-                        'sku',
-                        'description',
-                        'price',
-                        'stock',
-                        'weight',
-                        'is_active',
-                    ],
-                    ';',
-                    escape: '\\',
-                );
+        if ($response->header('Content-Disposition')) {
+            $headers['Content-Disposition'] = $response->header(
+                'Content-Disposition',
+            );
+        }
 
-                {{ model }}::query()
-                    ->orderBy('id')
-                    ->cursor()
-                    ->each(function ({{ model }} ${{ variable }}) use ($handle): void {
-                        fputcsv(
-                            $handle,
-                            [
-                                ${{ variable }}->id,
-                                ${{ variable }}->name,
-                                ${{ variable }}->sku,
-                                ${{ variable }}->description,
-                                ${{ variable }}->price,
-                                ${{ variable }}->stock,
-                                ${{ variable }}->weight,
-                                ${{ variable }}->is_active ? 1 : 0,
-                            ],
-                            ';',
-                            escape: '\\',
-                        );
-                    });
-
-                fclose($handle);
+        return response()->stream(
+            function () use ($response): void {
+                echo $response->body();
             },
-            '{{ table }}.csv',
-            [
-                'Content-Type' => 'text/csv',
-            ],
+            $response->status(),
+            $headers,
         );
     }
 }
