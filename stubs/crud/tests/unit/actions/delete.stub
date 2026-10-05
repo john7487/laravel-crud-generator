@@ -1,0 +1,19 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Actions\{{ model }}\Delete{{ model }}Action;
+use App\Models\{{ model }};
+
+it('can delete a {{ variable }}', function (): void {
+    ${{ variable }} = {{ model }}::factory()
+        ->create();
+
+    $action = new Delete{{ model }}Action();
+
+    $action->execute((string) ${{ variable }}->id);
+
+    $this->assertDatabaseMissing('{{ table }}', [
+        'id' => ${{ variable }}->id,
+    ]);
+});

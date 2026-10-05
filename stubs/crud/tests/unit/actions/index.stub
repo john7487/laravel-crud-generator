@@ -1,0 +1,36 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Actions\{{ model }}\Index{{ model }}Action;
+use App\Models\{{ model }};
+use Illuminate\Database\Eloquent\Collection;
+
+it('returns all {{ table }}', function (): void {
+    ${{ table }} = {{ model }}::factory()
+        ->count(3)
+        ->create();
+
+    $action = new Index{{ model }}Action();
+
+    $result = $action->execute();
+
+    expect($result)
+        ->toHaveKey('{{ table }}');
+
+    expect($result['{{ table }}'])
+        ->toBeInstanceOf(Collection::class)
+        ->toHaveCount(3)
+        ->pluck('id')
+        ->toEqualCanonicalizing(${{ table }}->pluck('id'));
+});
+
+it('returns an empty collection when no {{ table }} exist', function (): void {
+    $action = new Index{{ model }}Action();
+
+    $result = $action->execute();
+
+    expect($result['{{ table }}'])
+        ->toBeInstanceOf(Collection::class)
+        ->toBeEmpty();
+});

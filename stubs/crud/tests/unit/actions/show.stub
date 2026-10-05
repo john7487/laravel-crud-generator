@@ -1,0 +1,27 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Actions\{{ model }}\Show{{ model }}Action;
+use App\Models\{{ model }};
+
+it('can show a {{ variable }}', function (): void {
+    ${{ variable }} = {{ model }}::factory()->create([
+        'name' => 'Test {{ model }}',
+        'sku' => 'PRD-001',
+    ]);
+
+    $action = new Show{{ model }}Action();
+
+    $result = $action->execute((string) ${{ variable }}->id);
+
+    expect($result)
+        ->toHaveKey('{{ variable }}');
+
+    expect($result['{{ variable }}']->name)
+        ->toBe('Test {{ model }}');
+
+    expect($result['{{ variable }}']->sku)
+        ->toBe('PRD-001');
+
+});

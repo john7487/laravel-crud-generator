@@ -2,14 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Actions\{{ model }}\Update{{ model }}Action;
+use App\DTOs\{{ model }}\Update{{ model }}DTO;
 use App\Models\{{ model }};
-use App\Models\User;
-use Laravel\Sanctum\Sanctum;
-
-beforeEach(function (): void {
-    $this->user = User::factory()->create();
-    $this->endpoint = '/api/{{ route_path }}/{{ table }}';
-});
 
 it('can update a {{ variable }}', function (): void {
     ${{ variable }} = {{ model }}::factory()->create([
@@ -19,7 +14,7 @@ it('can update a {{ variable }}', function (): void {
         'stock' => 10,
     ]);
 
-    $payload = [
+    $request = [
         'name' => 'Updated {{ model }}',
         'sku' => 'PRD-002',
         'description' => 'Updated description',
@@ -29,22 +24,10 @@ it('can update a {{ variable }}', function (): void {
         'is_active' => true,
     ];
 
-    Sanctum::actingAs($this->user);
+    $action = new Update{{ model }}Action();
+    $data = new Update{{ model }}DTO($request);
 
-    $response = $this->put(
-        "{$this->endpoint}/{${{ variable }}->id}",
-        $payload
-    );
-
-    $response
-        ->assertSuccessful()
-        ->assertJsonStructure([
-            'data' => [
-                'type',
-                'id',
-                'attributes',
-            ],
-        ]);
+    $result = $action->execute($data, (string) ${{ variable }}->id);
 
     $this->assertDatabaseHas('{{ table }}', [
         'id' => ${{ variable }}->id,

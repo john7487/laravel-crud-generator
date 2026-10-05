@@ -11,7 +11,7 @@ use App\Http\Controllers\Api{{ controller_namespace }}\{{ model }}\StoreControll
 use App\Http\Controllers\Api{{ controller_namespace }}\{{ model }}\UpdateController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['throttle:api'])->prefix('{{ table }}')->name('{{ table }}.')->group(function (): void {
+Route::middleware(['auth:sanctum', 'throttle:api'])->prefix('{{ table }}')->name('{{ table }}.')->group(function (): void {
     Route::get('/', IndexController::class)->name('index');
     Route::post('/', StoreController::class)->name('store');
     Route::post('/import', ImportController::class)->name('import');

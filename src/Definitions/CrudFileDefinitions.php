@@ -22,6 +22,8 @@ public static function resolve(
         CrudFileType::DTO => self::dto($action), 
         CrudFileType::ACTION => self::action($action), 
         CrudFileType::TEST => self::test($action), 
+        CrudFileType::TESTUNITACTION => self::testUnitAction($action), 
+        CrudFileType::TESTUNITREQUEST => self::testUnitRequest($action),
     }; 
 }
 
@@ -37,6 +39,7 @@ public static function base(): array
         self::resource(),
         self::migration(),
         self::route(),
+        self::testUnitModel(),
     ];
 }
 
@@ -100,6 +103,34 @@ public static function base(): array
         );
     }
 
+    private static function testUnitAction(
+        CrudAction $action,
+    ): GeneratorDefinition {
+        return new GeneratorDefinition(
+            name: 'Test Unit'.$action->value.'Action',
+            stub: 'crud/tests/unit/actions/'.Str::lower($action->value).'.stub',
+            directory: 'tests/Unit',
+            filename: 'Actions/{{ model }}/{{ crud }}{{ model }}ActionTest.php',
+            crud: $action->value,
+        );
+    }
+
+    private static function testUnitRequest(
+        CrudAction $action,
+    ): GeneratorDefinition {
+        return new GeneratorDefinition(
+            name: 'Test Unit'.$action->value.'Request',
+            stub: 'crud/tests/unit/request/'.Str::lower($action->value).'.stub',
+            directory: 'tests/Unit',
+            filename: 'Http/Request/Api/{{ controller }}/{{ crud }}RequestTest.php',
+            crud: $action->value,
+        );
+    }
+
+
+
+
+
     private static function model(): GeneratorDefinition
     {
         return new GeneratorDefinition(
@@ -153,6 +184,16 @@ public static function base(): array
             stub: 'crud/base/route.stub',
             directory: 'routes/api',
             filename: '{{ route_path }}/{{ variable }}.php',
+            crud: '',
+        );
+    }
+
+    private static function testUnitModel(): GeneratorDefinition {
+        return new GeneratorDefinition(
+            name: 'TestModelUnit',
+            stub: 'crud/tests/unit/model.test.stub',
+            directory: 'tests/Unit',
+            filename: 'Models/{{ model }}Test.php',
             crud: '',
         );
     }

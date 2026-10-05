@@ -3,6 +3,13 @@
 declare(strict_types=1);
 
 use App\Models\{{ model }};
+use App\Models\User;
+use Laravel\Sanctum\Sanctum;
+
+beforeEach(function (): void {
+    $this->user = User::factory()->create();
+    $this->endpoint = '/api/{{ route_path }}/{{ table }}/export';
+});
 
 it('can export {{ table }} to csv', function (): void {
     {{ model }}::factory()->create([
@@ -25,7 +32,9 @@ it('can export {{ table }} to csv', function (): void {
         'is_active' => false,
     ]);
 
-    $response = $this->get('/api/{{ route_path }}/{{ table }}/export');
+    Sanctum::actingAs($this->user);
+
+    $response = $this->get($this->endpoint);
 
     $response
         ->assertSuccessful()
@@ -41,6 +50,16 @@ it('can export {{ table }} to csv', function (): void {
         ->toContain('id;name;sku;description;price;stock;weight;is_active')
         ->toContain('{{ model }} A')
         ->toContain('SKU-001')
+        ->toContain('Description A')
+        ->toContain('10000')
+        ->toContain('10')
+        ->toContain('1.5')
+        ->toContain('1')
         ->toContain('{{ model }} B')
-        ->toContain('SKU-002');
+        ->toContain('SKU-002')
+        ->toContain('Description B')
+        ->toContain('20000')
+        ->toContain('20')
+        ->toContain('2.5')
+        ->toContain('0');
 });

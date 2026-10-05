@@ -35,6 +35,7 @@ final class CrudDefinition
                 CrudFileType::CONTROLLER,
                 CrudFileType::ACTION,
                 CrudFileType::TEST,
+                CrudFileType::TESTUNITACTION, 
             ],
 
             CrudAction::STORE->value => [
@@ -43,6 +44,8 @@ final class CrudDefinition
                 CrudFileType::DTO,
                 CrudFileType::ACTION,
                 CrudFileType::TEST,
+                CrudFileType::TESTUNITACTION,
+                CrudFileType::TESTUNITREQUEST,
             ],
 
             CrudAction::UPDATE->value => [
@@ -51,18 +54,22 @@ final class CrudDefinition
                 CrudFileType::DTO,
                 CrudFileType::ACTION,
                 CrudFileType::TEST,
+                CrudFileType::TESTUNITACTION,
+                CrudFileType::TESTUNITREQUEST,
             ],
 
             CrudAction::SHOW->value => [
                 CrudFileType::CONTROLLER,
                 CrudFileType::ACTION,
                 CrudFileType::TEST,
+                CrudFileType::TESTUNITACTION,
             ],
 
             CrudAction::DELETE->value => [
                 CrudFileType::CONTROLLER,
                 CrudFileType::ACTION,
                 CrudFileType::TEST,
+                CrudFileType::TESTUNITACTION,
             ],
 
             CrudAction::IMPORT->value => [
@@ -71,6 +78,8 @@ final class CrudDefinition
                 CrudFileType::DTO,
                 CrudFileType::ACTION,
                 CrudFileType::TEST,
+                CrudFileType::TESTUNITACTION,
+                CrudFileType::TESTUNITREQUEST,
             ],
 
             CrudAction::EXPORT->value => [

@@ -1,0 +1,71 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Http\Requests\Api\V1\{{ model }}\StoreRequest;
+
+it('returns validation rules', function (): void {
+    $request = new StoreRequest();
+
+    $rules = $request->rules();
+
+    expect($rules)
+        ->toHaveKeys([
+            'name',
+            'sku',
+            'description',
+            'price',
+            'stock',
+            'weight',
+            'is_active',
+        ]);
+
+    expect($rules['name'])
+        ->toContain('required')
+        ->toContain('string');
+
+    expect($rules['sku'])
+        ->toContain('required')
+        ->toContain('unique:{{ table }},sku');
+
+});
+
+it('converts Store to DTO', function (): void {
+    $request = new StoreRequest();
+
+    $request->merge([
+        'name' => '{{ model }}',
+        'sku' => '{{ variable }}-sku',
+        'description' => '{{ variable }}-description',
+        'price' => 100,
+        'stock' => 5,
+        'weight' => 1.5,
+        'is_active' => true,
+    ]);
+
+    $request->setValidator(
+        validator(
+            $request->all(),
+            $request->rules(),
+        ),
+    );
+
+    $dto = $request->toDto();
+
+    expect($dto->attributes)
+        ->toBe([
+            'name' => '{{ model }}',
+            'sku' => '{{ variable }}-sku',
+            'description' => '{{ variable }}-description',
+            'price' => 100,
+            'stock' => 5,
+            'weight' => 1.5,
+            'is_active' => true,
+        ]);
+});
+
+it('authorizes request tobeTrue', function (): void {
+    $request = new StoreRequest();
+    expect($request->authorize())->toBeTrue();
+
+});

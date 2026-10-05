@@ -3,23 +3,32 @@
 declare(strict_types=1);
 
 use App\Models\{{ model }};
+use App\Models\User;
+use Laravel\Sanctum\Sanctum;
+
+beforeEach(function (): void {
+    $this->user = User::factory()->create();
+    $this->endpoint = '/api/{{ route_path }}/{{ table }}';
+});
 
 it('can delete a {{ variable }}', function (): void {
     ${{ variable }} = {{ model }}::factory()->create();
 
+    Sanctum::actingAs($this->user);
+
     $response = $this->delete(
-        "/api/{{ route_path }}/{{ table }}/{${{ variable }}->id}"
+        "{$this->endpoint}/{${{ variable }}->id}"
     );
 
     $response->assertSuccessful();
 
-    $this->assertDatabaseMissing('{{ table }}', [
-        'id' => ${{ variable }}->id,
-    ]);
 });
 
 it('returns not found when deleting a {{ variable }} that does not exist', function (): void {
-    $response = $this->delete('/api/{{ route_path }}/{{ table }}/999999');
+
+    Sanctum::actingAs($this->user);
+
+    $response = $this->delete('{$this->endpoint}/{{ table }}/999999');
 
     $response->assertNotFound();
 });

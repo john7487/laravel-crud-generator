@@ -9,4 +9,6 @@ enum CrudFileType: string
     case DTO = 'dto';
     case ACTION = 'action';
     case TEST = 'test';
+    case TESTUNITACTION = 'test-unit-action';
+    case TESTUNITREQUEST = 'test-unit-request';
 }

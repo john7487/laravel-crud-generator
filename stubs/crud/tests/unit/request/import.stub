@@ -1,0 +1,51 @@
+<?php
+
+declare(strict_types=1);
+
+use App\DTOs\{{ model }}\Import{{ model }}DTO;
+use App\Http\Requests\Api\V1\{{ model }}\ImportRequest;
+use Illuminate\Http\UploadedFile;
+
+it('returns validation rules', function (): void {
+    $request = new ImportRequest();
+
+    $rules = $request->rules();
+
+    expect($rules)
+        ->toHaveKeys([
+            'file',
+        ]);
+
+    expect($rules['file'])
+        ->toContain('required')
+        ->toContain('file')
+        ->toContain('mimes:csv,txt')
+        ->toContain('max:10240');
+});
+
+it('converts Store to DTO', function (): void {
+
+    $file = UploadedFile::fake()->createWithContent(
+        '{{ table }}.csv',
+        'id;name;sku',
+    );
+
+    $request = new ImportRequest();
+
+    $request->files->set('file', $file);
+
+    $dto = $request->toDto();
+
+    expect($dto)
+        ->toBeInstanceOf(Import{{ model }}DTO::class);
+
+    expect($dto->file)
+        ->toBe($file);
+
+});
+
+it('authorizes request tobeTrue', function (): void {
+    $request = new ImportRequest();
+    expect($request->authorize())->toBeTrue();
+
+});
